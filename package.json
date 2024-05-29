@@ -1,0 +1,26 @@
+{
+  "name": "projet_serveur_web",
+  "version": "1.0.0",
+  "description": "Projet serveur web. Collège La Cité.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jahswant/projet_serveur_web.git"
+  },
+  "keywords": [
+    "SERVEUR",
+    "WEB",
+    "COLLEGE",
+    "LA",
+    "CITE"
+  ],
+  "author": "Jahswant Fodouop",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jahswant/projet_serveur_web/issues"
+  },
+  "homepage": "https://github.com/jahswant/projet_serveur_web#readme"
+}
