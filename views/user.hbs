@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil de {{user.name}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>Profil de {{user.name}}</h1>
+    <ul>
+        {{#each posts}}
+            <li>
+                <p><strong>{{name}}</strong> - {{formatDate timestamp}}</p>
+                <p>{{text}}</p>
+                <p>Likes: {{likes}}</p>
+            </li>
+        {{/each}}
+    </ul>
+</body>
+</html>

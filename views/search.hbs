@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche d'utilisateur</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>Recherche d'utilisateur</h1>
+    <form action="/users/search" method="GET">
+        <input type="text" name="q" placeholder="Rechercher un utilisateur...">
+        <button type="submit">Rechercher</button>
+    </form>
+    <ul>
+        {{#each users}}
+            <li>
+                <a href="/users/{{id}}/posts">{{name}}</a>
+            </li>
+        {{/each}}
+    </ul>
+</body>
+</html>
