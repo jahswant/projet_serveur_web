@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil de {{user.name}}</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <meta charset="UTF-8"> <!-- Définir l'encodage des caractères -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Assurer une bonne mise en page sur les appareils mobiles -->
+    <title>Profil de {{user.name}}</title> <!-- Titre de la page, incluant le nom de l'utilisateur -->
+    <link rel="stylesheet" href="/css/styles.css"> <!-- Lien vers la feuille de styles CSS -->
 </head>
 <body>
-    <h1>Profil de {{user.name}}</h1>
+    <h1>Profil de {{user.name}}</h1> <!-- En-tête principal avec le nom de l'utilisateur -->
     <ul>
+        <!-- Boucle à travers chaque publication de l'utilisateur -->
         {{#each posts}}
             <li>
+                <!-- Afficher le nom de l'utilisateur et la date formatée de la publication -->
                 <p><strong>{{name}}</strong> - {{formatDate timestamp}}</p>
+                <!-- Afficher le texte de la publication -->
                 <p>{{text}}</p>
+                <!-- Afficher le nombre de likes de la publication -->
                 <p>Likes: {{likes}}</p>
             </li>
         {{/each}}
