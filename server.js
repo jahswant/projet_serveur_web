@@ -26,6 +26,7 @@ app.set('views', './views'); // Définir le répertoire des vues
 // Middleware pour parser les requêtes
 app.use(json()); // Parser les payloads JSON entrants
 
+//https://www.geeksforgeeks.org/express-js-express-urlencoded-function/
 app.use(express.urlencoded({ extended: true })); // Parser les données URL-encodées
 
 // Middleware pour la sécurité

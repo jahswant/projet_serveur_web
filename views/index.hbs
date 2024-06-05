@@ -21,7 +21,7 @@
         {{#each posts}}
             <li>
                 <!-- Afficher le nom de l'utilisateur et la date formatée de la publication -->
-                <p><strong>{{name}}</strong> - {{formatDate timestamp}}</p>
+                <p></p><a target="_self" href="/users/{{id_user}}/posts"><strong>{{name}}</strong></a>  - {{formatDate timestamp}}</p>
                 <!-- Afficher le texte de la publication -->
                 <p>{{text}}</p>
                 <!-- Afficher le nombre de likes pour la publication -->
