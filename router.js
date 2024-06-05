@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     const db = await connectionPromise; // Attendre la connexion à la base de données
     // Exécuter la requête SQL pour récupérer toutes les publications avec le nombre de likes
     const posts = await db.all(`
-        SELECT posts.id_post, posts.text, posts.timestamp, users.name, COUNT(likes.id_user) as likes 
+        SELECT posts.id_post, posts.text, posts.timestamp, users.name, COUNT(likes.id_user) as likes, users.id_user 
         FROM posts 
         LEFT JOIN users ON posts.id_user = users.id_user 
         LEFT JOIN likes ON posts.id_post = likes.id_post 

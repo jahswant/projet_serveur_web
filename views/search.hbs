@@ -21,9 +21,11 @@
         {{#each users}}
             <li>
                 <!-- Lien vers la page des publications de l'utilisateur -->
-                <a href="/users/{{id}}/posts">{{name}}</a> <!-- Le nom de l'utilisateur est affiché comme texte du lien, et l'ID est utilisé dans l'URL -->
+                <a target="_self" href="/users/{{id}}/posts">{{name}}</a> <!-- Le nom de l'utilisateur est affiché comme texte du lien, et l'ID est utilisé dans l'URL -->
             </li>
         {{/each}}
     </ul>
 </body>
 </html>
+
+
