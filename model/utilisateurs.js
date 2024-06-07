@@ -1,14 +1,16 @@
 import connectionPromise from '../connexion.js';
+import bcrypt from 'bcrypt';
 
-export async function addUtilisateur(id_user_type,name,email,password){
+export async function addUtilisateur(id_user_type,username,email,password){
     const db = await connectionPromise;
-    const utilisateur = db.run(
+    let user_password = await bcrypt.hash(password, 10);
+      const res = await db.run(
         `INSERT INTO users(id_user_type,name,email,password)
           VALUES(?,?,?,?)`,
-        [id_user_type,name,email,password]
+        [id_user_type,username,email,user_password]
     )
 
-
+    return res.lastID;
 }
 
 export async function getUtilisateurParCourriel(email){

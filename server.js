@@ -9,6 +9,8 @@ import cors from 'cors'; // Importer cors pour le partage des ressources entre o
 import { getPosts, addPost } from './model/posts.js';
 import { getUser, getUserPosts, searchUser } from './model/users.js';
 import { validateIdUser, validateTexte, validateNumber, validateSearchTexte } from './validation.js'
+import passport from 'passport';
+import {addUtilisateur,getUtilisateurParCourriel,getUtilisateurParID} from "./model/utilisateurs.js"
 
 const MemoryStore = memorystore(session);
 
@@ -42,6 +44,8 @@ app.use(compression()); // Compresser les réponses HTTP
 
 // Middleware pour CORS
 app.use(cors()); // Activer le partage des ressources entre origines (CORS)
+
+app.use(passport.initialize());
 
 // Middleware pour servir les fichiers statiques
 app.use(express.static('public')); // Servir les fichiers statiques depuis le répertoire 'public'
@@ -85,7 +89,7 @@ app.get('/connexion', async (req, res) => {
     res.render('authentification', {
         titre: 'Connectez Vous',
         layout: 'main',
-        scripts: ['/js/main.js'],
+        scripts: ['/js/main.js','/js/validerconnexion.js'],
         styles: [],
         acceptCookie : req.session.acceptCookie
     });
@@ -100,14 +104,25 @@ app.get('/inscription', async (req, res) => {
     }
 
     res.render('enregistrement', {
+        
         titre: 'Enregistez Vous',
         layout: 'main',
-        scripts: ['/js/main.js'],
+        scripts: ['/js/main.js','/js/validerinscription.js'],
         styles: [],
         acceptCookie : req.session.acceptCookie
     });
 
 });
+
+// Ajouter un nouvel utilisateur
+app.post('/users/add', async (req, res) => {
+    console.log(req.body); // Récupérer le texte de la publication depuis la requête
+    const { id_user_type, username, email, password } = req.body;
+    const lastID = addUtilisateur(id_user_type,username,email,password);
+    res.status(201).json({ id: lastID });
+});
+
+
 
 
 // Ajouter une nouvelle publication

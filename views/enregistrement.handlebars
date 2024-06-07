@@ -1,12 +1,28 @@
 <h1>Enregistrez Vous</h1>
-<form action="#" method="POST">
-    <label for="name">Nom:</label><br>
-    <input type="text" id="name" name="name" required><br><br>
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" required><br><br>
-    <label for="password">Mot De Passe:</label><br>
-    <input type="password" id="password" name="password" required><br><br>
-    <label for="confirmpassword">Confirmer Mot De Passe:</label><br>
-    <input type="password" id="confirmpassword" name="confirmpassword" required><br><br>
+<form id="forminscription" novalidate>
+    <div class="form-control">
+        <label for="name">Nom:</label><br>
+        <input type="text" id="name" name="name" required><br>
+        <small></small><br>
+    </div>
+    
+    <div class="form-control">
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+        <small></small><br>
+    </div>
+    
+    <div class="form-control">
+        <label for="password">Mot De Passe:</label><br>
+        <input type="password" id="password" name="password" required><br>
+        <small></small><br>
+    </div>
+    
+    <div class="form-control">
+        <label for="confirmpassword">Confirmer Mot De Passe:</label><br>
+        <input type="password" id="confirmpassword" name="confirmpassword" required><br>
+        <small></small><br>
+    </div>
+    
     <button type="submit">Envoyer</button>
 </form>

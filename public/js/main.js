@@ -12,6 +12,7 @@ async function acceptCookies(){
    const rep = await fetch("/api/cookies",{
         method :"POST"
     });
+    
     if (rep.ok){
         baniereCookies.remove(); 
     }

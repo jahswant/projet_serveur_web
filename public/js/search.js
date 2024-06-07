@@ -30,5 +30,6 @@ formsearch.addEventListener('submit', (event) => {
         event.preventDefault(); // Prevent form submission if the input is invalid
     }
 });
+
 inputsearch.addEventListener('input', validateTextSearch);
 
