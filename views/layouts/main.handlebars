@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titre}}</title>
+
+    <!-- CSS générique utilisé par toutes les pages -->
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+
+    <!-- CSS spécifique -->
+    {{#each styles}}
+    <link rel="stylesheet" type="text/css" href="{{this}}">
+    {{/each}}
+
+    <!-- JS spécifique -->
+    {{#each scripts}}
+    <script type="module" src="{{this}}"></script>
+    {{/each}}
+
+</head>
+
+<body>
+    {{>header}}
+
+    <main>
+        {{{body}}}
+    </main>
+
+    {{>footer}}
+</body>
+
+</html>

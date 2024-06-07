@@ -14,7 +14,7 @@ const IS_NEW = !existsSync(process.env.DB_FILE)
  */
 const createDatabase = async (connectionPromise) => {
 	const connection = await connectionPromise;
-	
+
 	await connection.exec(
 		`CREATE TABLE IF NOT EXISTS user_types(
 			id_user_type INTEGER PRIMARY KEY,
@@ -111,14 +111,14 @@ const createDatabase = async (connectionPromise) => {
 
 // Base de données dans un fichier
 let connectionPromise = open({
-    filename: process.env.DB_FILE,
-    driver: sqlite3.Database
+	filename: process.env.DB_FILE,
+	driver: sqlite3.Database
 });
 
 // Si le fichier de base de données n'existe pas, on crée la base de données
 // et on y insère des données fictive de test.
 if (IS_NEW) {
-    connectionPromise = createDatabase(connectionPromise);
+	connectionPromise = createDatabase(connectionPromise);
 }
 
 export default connectionPromise;
