@@ -1,12 +1,16 @@
 import express, { json } from 'express'; // Importer express et le middleware json
 import "dotenv/config"; // Charger les variables d'environnement depuis un fichier .env
 import { engine } from 'express-handlebars'; // Importer le moteur de templates express-handlebars
+import session from 'express-session';
+import memorystore from 'memorystore'
 import helmet from 'helmet'; // Importer helmet pour la sécurité
 import compression from 'compression'; // Importer compression pour la compression des réponses
 import cors from 'cors'; // Importer cors pour le partage des ressources entre origines
 import { getPosts, addPost } from './model/posts.js';
 import { getUser, getUserPosts, searchUser } from './model/users.js';
 import { validateIdUser, validateTexte, validateNumber, validateSearchTexte } from './validation.js'
+
+const MemoryStore = memorystore(session);
 
 const app = express(); // Créer une instance d'application express
 const PORT = process.env.PORT || 5000; // Définir le port sur lequel le serveur écoutera, en utilisant une variable d'environnement ou le port 5000 par défaut
@@ -42,19 +46,69 @@ app.use(cors()); // Activer le partage des ressources entre origines (CORS)
 // Middleware pour servir les fichiers statiques
 app.use(express.static('public')); // Servir les fichiers statiques depuis le répertoire 'public'
 
+app.use(session({
+    cookie : {maxAge : 360000},
+    name : process.env.npm_package_name,
+    store : new MemoryStore({ checkPeriod : 360000}),
+    resave : false,
+    saveUninitialized : false,
+    secret : process.env.SESSION_SECRET
+}));
+
 // Routes
 // Page d'accueil : afficher toutes les publications
 app.get('/', async (req, res) => {
 
+    if (req.session.compteur === undefined) {
+        req.session.compteur = 0;  
+    }
+
     res.render('index', {
         titre: 'Accueil | Liste Publications',
         layout: 'main',
-        scripts: ['/js/index.js'],
+        scripts: ['/js/index.js','/js/main.js'],
         styles: [],
-        posts: await getPosts()
+        posts: await getPosts(),
+        acceptCookie : req.session.acceptCookie
     });
 
 });
+
+
+// Page de connexion
+app.get('/connexion', async (req, res) => {
+
+    if (req.session.compteur === undefined) {
+        req.session.compteur = 0;  
+    }
+
+    res.render('authentification', {
+        titre: 'Connectez Vous',
+        layout: 'main',
+        scripts: ['/js/main.js'],
+        styles: [],
+        acceptCookie : req.session.acceptCookie
+    });
+
+});
+
+// Page d'Inscription
+app.get('/inscription', async (req, res) => {
+
+    if (req.session.compteur === undefined) {
+        req.session.compteur = 0;  
+    }
+
+    res.render('enregistrement', {
+        titre: 'Enregistez Vous',
+        layout: 'main',
+        scripts: ['/js/main.js'],
+        styles: [],
+        acceptCookie : req.session.acceptCookie
+    });
+
+});
+
 
 // Ajouter une nouvelle publication
 app.post('/posts', async (req, res) => {
@@ -79,18 +133,20 @@ app.get('/users/search', async (req, res) => {
         res.render('search', {
             titre: 'Utilisateurs | Rechercher',
             layout: 'main',
-            scripts: ['/js/search.js'],
+            scripts: ['/js/search.js','/js/main.js'],
             styles: [],
-            users: await searchUser(q)
+            users: await searchUser(q),
+            acceptCookie : req.session.acceptCookie
         });
     } else {
 
         res.render('search', {
             titre: 'Utilisateurs | Rechercher',
             layout: 'main',
-            scripts: ['/js/search.js'],
+            scripts: ['/js/search.js','/js/main.js'],
             styles: [],
-            users: []
+            users: [],
+            acceptCookie : req.session.acceptCookie
         });
     }
 
@@ -101,8 +157,9 @@ app.get('/aboutus', (req, res) => {
     res.render('aboutus', {
         titre: 'Apropos De Nous',
         layout: 'main',
-        scripts: [],
-        styles: []
+        scripts: ['/js/main.js'],
+        styles: [],
+        acceptCookie : req.session.acceptCookie
     });
 
 });
@@ -113,8 +170,9 @@ app.get('/contactus', (req, res) => {
     res.render('contactus', {
         titre: 'Nous Contacter',
         layout: 'main',
-        scripts: [],
-        styles: []
+        scripts: ['/js/main.js'],
+        styles: [],
+        acceptCookie : req.session.acceptCookie
     });
 
 });
@@ -129,17 +187,22 @@ app.get('/users/:id/posts', async (req, res) => {
         res.render('user', {
             titre: 'Utilisateurs | Liste Publications',
             layout: 'main',
-            scripts: [],
+            scripts: ['/js/main.js'],
             styles: [],
             posts: await getUserPosts(id),
-            user: await getUser(id)
+            user: await getUser(id),
+            acceptCookie : req.session.acceptCookie
         });
     }
     else {
         res.status(404).end();
     }
+});
 
-
+//Routes des cookies
+app.post("/api/cookies",(req,res) => {
+    req.session.acceptCookie = true;
+    res.status(201).end();
 });
 
 // Démarrer le serveur

@@ -25,6 +25,12 @@
     {{>header}}
 
     <main>
+        {{#unless acceptCookie}}
+        <div id ="baniere-cookies" class="cookies">
+            Ce site utilise les Cookies.Si vous naviguez vous acceptez d'utiliser les Cookies.
+            <input type="button" id="button-cookie" value ="J'ai Compris"/>
+        </div>
+        {{/unless}}
         {{{body}}}
     </main>
 
