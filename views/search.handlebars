@@ -1,0 +1,24 @@
+<h1>Recherche d'utilisateur</h1> <!-- En-tête principal de la page -->
+
+<!-- Formulaire de recherche -->
+<form id="form-search" action="/users/search" novalidate>
+    <!-- Le formulaire utilise la méthode GET et envoie les données à l'URL /users/search -->
+    <div>
+        <input id="text-search" type="text" name="q" placeholder="Rechercher un utilisateur..." required minlength="5"
+            maxlength="50"> <!-- Champ de saisie pour la recherche d'utilisateur -->
+        <button type="submit">Rechercher</button> <!-- Bouton pour soumettre le formulaire -->
+    </div>
+    <div id="text-search-error" class="error"></div>
+</form>
+
+<!-- Liste des utilisateurs trouvés -->
+<ul>
+    <!-- Boucle pour chaque utilisateur trouvé -->
+    {{#each users}}
+    <li>
+        <!-- Lien vers la page des publications de l'utilisateur -->
+        <a target="_self" href="/users/{{id}}/posts">{{name}}</a>
+        <!-- Le nom de l'utilisateur est affiché comme texte du lien, et l'ID est utilisé dans l'URL -->
+    </li>
+    {{/each}}
+</ul>

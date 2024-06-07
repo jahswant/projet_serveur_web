@@ -1,0 +1,31 @@
+<h1>Publications</h1> <!-- En-tête principal de la page -->
+
+<!-- Formulaire de création de publication -->
+<form id="form-ajout" novalidate> <!-- Le formulaire utilise la méthode POST et envoie les données à l'URL /posts -->
+    <div>
+        <textarea id="text-ajout" name="text" placeholder="Écrire une publication..." required minlength="5"
+            maxlength="50"></textarea>
+        <!-- Champ de texte pour écrire la publication -->
+        <button type="submit">Publier</button> <!-- Bouton pour soumettre le formulaire -->
+
+    </div>
+
+    <div id="text-add-error" class="error"></div>
+
+</form>
+
+<!-- Liste des publications -->
+<ul>
+    <!-- Boucle pour chaque publication -->
+    {{#each posts}}
+    <li>
+        <!-- Afficher le nom de l'utilisateur et la date formatée de la publication -->
+        <p><a target="_self" href="/users/{{id_user}}/posts"><strong>{{name}}</strong></a> - {{formatDate timestamp}}
+        </p>
+        <!-- Afficher le texte de la publication -->
+        <p>{{text}}</p>
+        <!-- Afficher le nombre de likes pour la publication -->
+        <p>Likes: {{likes}}</p>
+    </li>
+    {{/each}}
+</ul>
