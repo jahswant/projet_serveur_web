@@ -6,11 +6,13 @@ import memorystore from 'memorystore'
 import helmet from 'helmet'; // Importer helmet pour la sécurité
 import compression from 'compression'; // Importer compression pour la compression des réponses
 import cors from 'cors'; // Importer cors pour le partage des ressources entre origines
+import passport from "passport";
 import { getPosts, addPost } from './model/posts.js';
 import { getUser, getUserPosts, searchUser } from './model/users.js';
-import { validateIdUser, validateTexte, validateNumber, validateSearchTexte } from './validation.js'
-import passport from 'passport';
-import {addUtilisateur,getUtilisateurParCourriel,getUtilisateurParID} from "./model/utilisateurs.js"
+import { validateIdUser, validateTexte, validateCourriel, validateSearchTexte, validateMotDePasse } from './validation.js'
+import { addUtilisateur } from "./model/utilisateurs.js"
+import { initializePassport } from './model/passportconfig.js';
+
 
 const MemoryStore = memorystore(session);
 
@@ -45,37 +47,79 @@ app.use(compression()); // Compresser les réponses HTTP
 // Middleware pour CORS
 app.use(cors()); // Activer le partage des ressources entre origines (CORS)
 
-app.use(passport.initialize());
-
 // Middleware pour servir les fichiers statiques
 app.use(express.static('public')); // Servir les fichiers statiques depuis le répertoire 'public'
 
+
+initializePassport();
+
+app.use(passport.initialize());
+
 app.use(session({
-    cookie : {maxAge : 360000},
-    name : process.env.npm_package_name,
-    store : new MemoryStore({ checkPeriod : 360000}),
-    resave : false,
-    saveUninitialized : false,
-    secret : process.env.SESSION_SECRET
+    cookie: { maxAge: 360000 },
+    name: process.env.npm_package_name,
+    store: new MemoryStore({ checkPeriod: 360000 }),
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET
 }));
+
+
 
 // Routes
 // Page d'accueil : afficher toutes les publications
 app.get('/', async (req, res) => {
 
     if (req.session.compteur === undefined) {
-        req.session.compteur = 0;  
+        req.session.compteur = 0;
     }
 
     res.render('index', {
         titre: 'Accueil | Liste Publications',
         layout: 'main',
-        scripts: ['/js/index.js','/js/main.js'],
+        scripts: ['/js/index.js', '/js/main.js'],
         styles: [],
         posts: await getPosts(),
-        acceptCookie : req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie
     });
 
+});
+
+app.post('/users/login', (req, res, next) => {
+    // On vérifie le le courriel et le mot de passe
+    // envoyé sont valides
+    if (validateCourriel(req.body.email) &&
+        validateMotDePasse(req.body.password)) {
+        // On lance l'authentification avec passport.js
+        passport.authenticate('local', (error, user, info) => {
+            if (error) {
+                // S'il y a une erreur, on la passe
+                // au serveur
+                next(error);
+            }
+            else if (!user) {
+                // Si la connexion échoue, on envoit
+                // l'information au client avec un code
+                // 401 (Unauthorized)
+                res.status(401).json(info);
+            }
+            else {
+                // Si tout fonctionne, on ajoute
+                // l'utilisateur dans la session et
+                // on retourne un code 200 (OK)
+                req.logIn(user, (error) => {
+                    if (error) {
+                        next(error);
+                    }
+
+                    res.sendStatus(200);
+                });
+            }
+        })(req, res, next);
+    }
+    else {
+        res.sendStatus(400);
+    }
 });
 
 
@@ -83,15 +127,15 @@ app.get('/', async (req, res) => {
 app.get('/connexion', async (req, res) => {
 
     if (req.session.compteur === undefined) {
-        req.session.compteur = 0;  
+        req.session.compteur = 0;
     }
 
     res.render('authentification', {
         titre: 'Connectez Vous',
         layout: 'main',
-        scripts: ['/js/main.js','/js/validerconnexion.js'],
+        scripts: ['/js/main.js', '/js/validerconnexion.js'],
         styles: [],
-        acceptCookie : req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie
     });
 
 });
@@ -100,16 +144,16 @@ app.get('/connexion', async (req, res) => {
 app.get('/inscription', async (req, res) => {
 
     if (req.session.compteur === undefined) {
-        req.session.compteur = 0;  
+        req.session.compteur = 0;
     }
 
     res.render('enregistrement', {
-        
+
         titre: 'Enregistez Vous',
         layout: 'main',
-        scripts: ['/js/main.js','/js/validerinscription.js'],
+        scripts: ['/js/main.js', '/js/validerinscription.js'],
         styles: [],
-        acceptCookie : req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie
     });
 
 });
@@ -118,7 +162,7 @@ app.get('/inscription', async (req, res) => {
 app.post('/users/add', async (req, res) => {
     console.log(req.body); // Récupérer le texte de la publication depuis la requête
     const { id_user_type, username, email, password } = req.body;
-    const lastID = addUtilisateur(id_user_type,username,email,password);
+    const lastID = addUtilisateur(id_user_type, username, email, password);
     res.status(201).json({ id: lastID });
 });
 
@@ -148,20 +192,20 @@ app.get('/users/search', async (req, res) => {
         res.render('search', {
             titre: 'Utilisateurs | Rechercher',
             layout: 'main',
-            scripts: ['/js/search.js','/js/main.js'],
+            scripts: ['/js/search.js', '/js/main.js'],
             styles: [],
             users: await searchUser(q),
-            acceptCookie : req.session.acceptCookie
+            acceptCookie: req.session.acceptCookie
         });
     } else {
 
         res.render('search', {
             titre: 'Utilisateurs | Rechercher',
             layout: 'main',
-            scripts: ['/js/search.js','/js/main.js'],
+            scripts: ['/js/search.js', '/js/main.js'],
             styles: [],
             users: [],
-            acceptCookie : req.session.acceptCookie
+            acceptCookie: req.session.acceptCookie
         });
     }
 
@@ -174,7 +218,7 @@ app.get('/aboutus', (req, res) => {
         layout: 'main',
         scripts: ['/js/main.js'],
         styles: [],
-        acceptCookie : req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie
     });
 
 });
@@ -187,7 +231,7 @@ app.get('/contactus', (req, res) => {
         layout: 'main',
         scripts: ['/js/main.js'],
         styles: [],
-        acceptCookie : req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie
     });
 
 });
@@ -206,7 +250,7 @@ app.get('/users/:id/posts', async (req, res) => {
             styles: [],
             posts: await getUserPosts(id),
             user: await getUser(id),
-            acceptCookie : req.session.acceptCookie
+            acceptCookie: req.session.acceptCookie
         });
     }
     else {
@@ -215,7 +259,7 @@ app.get('/users/:id/posts', async (req, res) => {
 });
 
 //Routes des cookies
-app.post("/api/cookies",(req,res) => {
+app.post("/api/cookies", (req, res) => {
     req.session.acceptCookie = true;
     res.status(201).end();
 });

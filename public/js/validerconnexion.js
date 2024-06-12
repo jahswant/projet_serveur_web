@@ -2,8 +2,7 @@ let inputCourriel = document.getElementById('input-courriel');
 let inputMotDePasse = document.getElementById('input-mot-de-passe');
 let formConnexion = document.getElementById('form-connexion');
 
-formConnexion.addEventListener('submit', async (event) => {
-    
+formConnexion.addEventListener("submit", async function (event) {
     let isValid = true;
 
     if (!validatePassword()) {
@@ -16,43 +15,43 @@ formConnexion.addEventListener('submit', async (event) => {
 
     if (!isValid) {
         event.preventDefault();
-    }else if (isValid) {
-
+    } else {
         event.preventDefault();
 
         // Préparation des données
         const data = {
             email: inputCourriel.value,
-            password : inputMotDePasse.value
+            password: inputMotDePasse.value
         };
 
-    // Requête d'ajout de todo au serveur
-    const response = await fetch('/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
-    
-    // Ajoute le todo dans l'interface graphique et réinitialise le formulaire
-    if(response.ok) {
-        const value = await response.json();
-        inputCourriel.value = '';
-        inputMotDePasse.value = '';
-        window.location.replace("/");
-        
-    }
-    else if(response.status === 401) {
-        // Si l'authentification ne réussi pas, on
-        // a le message d'erreur dans l'objet "data"
-        let data = await response.json()
-        
-        // Utiliser "data" pour afficher l'erreur ;a
-        // l'utilisateur ici ...
-    }
-    }
+        try {
+            // Requête d'ajout de todo au serveur
+            const response = await fetch('/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
+            // Ajoute le todo dans l'interface graphique et réinitialise le formulaire
+            if (response.ok) {
+                const value = await response.json();
+                inputCourriel.value = '';
+                inputMotDePasse.value = '';
+                window.location.replace("/");
+            } else if (response.status === 401) {
+                // Si l'authentification ne réussit pas, on a le message d'erreur dans l'objet "data"
+                let repdata = await response.json();
+                // Utiliser "data" pour afficher l'erreur à l'utilisateur ici ...
+                console.error('Server error:', repdata);
+            } else {
+                // Autres erreurs de réponse
+                console.error('Server error:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    }
 });
-
 
 function validateEmail() {
     const emailValue = inputCourriel.value.trim();
@@ -73,4 +72,16 @@ function validatePassword() {
     }
     hideError(inputMotDePasse);
     return true;
+}
+
+function showError(input, message) {
+    const formControl = input.parentElement;
+    const errorElement = formControl.querySelector("small");
+    errorElement.innerText = message;
+    formControl.classList.add("error");
+}
+
+function hideError(input) {
+    const formControl = input.parentElement;
+    formControl.classList.remove("error");
 }

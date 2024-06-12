@@ -37,3 +37,20 @@ export function validateNumber(value) {
         return false;
     }
 }
+
+// Validate email format
+export function validateCourriel(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return false;
+    }
+    return true;
+}
+
+// Validate password length
+export function validateMotDePasse(password) {
+    if (password.length < 6) {
+        return false;
+    }
+    return true;
+}
