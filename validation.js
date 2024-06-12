@@ -22,6 +22,18 @@ export function validateTexte(texte) {
 }
 
 
+/**
+ * Valide le Username reçu par le client.
+ * @param {*} validateUsername Le texte du Username à valider.
+ * @returns Une valeur indiquant si le Username est valide ou non.
+ */
+export function validateUsername(Username) {
+    return !!Username &&
+        typeof Username === 'string' &&
+        Username.length >= 6 &&
+        Username.length <= 20;
+}
+
 export function validateSearchTexte(texte) {
     return !!texte &&
         typeof texte === 'string' &&

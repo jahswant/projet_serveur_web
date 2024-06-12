@@ -9,9 +9,9 @@ import cors from 'cors'; // Importer cors pour le partage des ressources entre o
 import passport from "passport";
 import { getPosts, addPost } from './model/posts.js';
 import { getUser, getUserPosts, searchUser } from './model/users.js';
-import { validateIdUser, validateTexte, validateCourriel, validateSearchTexte, validateMotDePasse } from './validation.js'
+import { validateIdUser, validateTexte, validateCourriel, validateSearchTexte, validateMotDePasse, validateUsername } from './validation.js'
 import { addUtilisateur } from "./model/utilisateurs.js"
-import { initializePassport } from './model/passportconfig.js';
+import './passportconfig.js'
 
 
 const MemoryStore = memorystore(session);
@@ -47,13 +47,6 @@ app.use(compression()); // Compresser les réponses HTTP
 // Middleware pour CORS
 app.use(cors()); // Activer le partage des ressources entre origines (CORS)
 
-// Middleware pour servir les fichiers statiques
-app.use(express.static('public')); // Servir les fichiers statiques depuis le répertoire 'public'
-
-
-initializePassport();
-
-app.use(passport.initialize());
 
 app.use(session({
     cookie: { maxAge: 360000 },
@@ -64,14 +57,21 @@ app.use(session({
     secret: process.env.SESSION_SECRET
 }));
 
+app.use(passport.initialize());
+
+app.use(passport.session());
+
+// Middleware pour servir les fichiers statiques
+app.use(express.static('public')); // Servir les fichiers statiques depuis le répertoire 'public'
 
 
 // Routes
 // Page d'accueil : afficher toutes les publications
 app.get('/', async (req, res) => {
-
-    if (req.session.compteur === undefined) {
-        req.session.compteur = 0;
+    // Check if user is logged in
+    if (!req.session.loggedIn) {
+        // Redirect user to login page
+        return res.redirect('/connexion');
     }
 
     res.render('index', {
@@ -80,12 +80,15 @@ app.get('/', async (req, res) => {
         scripts: ['/js/index.js', '/js/main.js'],
         styles: [],
         posts: await getPosts(),
-        acceptCookie: req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie,
+        IsLoggedIn : req.session.IsLoggedIn
     });
-
 });
 
+
 app.post('/users/login', (req, res, next) => {
+
+
     // On vérifie le le courriel et le mot de passe
     // envoyé sont valides
     if (validateCourriel(req.body.email) &&
@@ -111,31 +114,44 @@ app.post('/users/login', (req, res, next) => {
                     if (error) {
                         next(error);
                     }
-
-                    res.sendStatus(200);
+                    else{
+                        req.session.loggedIn = true;
+                        res.sendStatus(200).end();
+                    }                   
                 });
             }
         })(req, res, next);
     }
     else {
-        res.sendStatus(400);
+        res.sendStatus(400).end();
     }
+});
+
+app.post('/users/logout', (req, res, next) => {
+    req.logout((erreur) =>{
+        if (erreur){
+            next(erreur);
+        } else {
+            req.session.loggedIn = false;
+            res.redirect("/connexion");
+        }
+       
+    });
 });
 
 
 // Page de connexion
 app.get('/connexion', async (req, res) => {
 
-    if (req.session.compteur === undefined) {
-        req.session.compteur = 0;
-    }
+ 
 
     res.render('authentification', {
         titre: 'Connectez Vous',
         layout: 'main',
         scripts: ['/js/main.js', '/js/validerconnexion.js'],
         styles: [],
-        acceptCookie: req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie,
+        IsLoggedIn : req.session.IsLoggedIn
     });
 
 });
@@ -143,9 +159,7 @@ app.get('/connexion', async (req, res) => {
 // Page d'Inscription
 app.get('/inscription', async (req, res) => {
 
-    if (req.session.compteur === undefined) {
-        req.session.compteur = 0;
-    }
+  
 
     res.render('enregistrement', {
 
@@ -153,17 +167,38 @@ app.get('/inscription', async (req, res) => {
         layout: 'main',
         scripts: ['/js/main.js', '/js/validerinscription.js'],
         styles: [],
-        acceptCookie: req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie,
+        IsLoggedIn : req.session.IsLoggedIn
     });
 
 });
 
 // Ajouter un nouvel utilisateur
 app.post('/users/add', async (req, res) => {
+    
     console.log(req.body); // Récupérer le texte de la publication depuis la requête
     const { id_user_type, username, email, password } = req.body;
-    const lastID = addUtilisateur(id_user_type, username, email, password);
-    res.status(201).json({ id: lastID });
+
+    try {
+        if (validateCourriel(email) &&
+            validateMotDePasse(password) &&
+            validateUsername(username) &&
+            validateIdUser(id_user_type)
+        ) {
+            const lastID = await addUtilisateur(id_user_type, username, email, password);
+            res.status(201).json({ id: lastID });
+        } else {
+            res.status(400).end();
+        }
+    } catch (erreur) {
+        if (erreur.code == 'SQLITE_CONSTRAINT'){
+            res.status(409).end();
+        } else {
+            next(erreur);
+        }
+
+    }
+
 });
 
 
@@ -171,6 +206,14 @@ app.post('/users/add', async (req, res) => {
 
 // Ajouter une nouvelle publication
 app.post('/posts', async (req, res) => {
+
+// Check if user is logged in
+if (!req.session.loggedIn) {
+    // Redirect user to login page
+    return res.redirect('/connexion');
+}
+
+
     const { text } = req.body; // Récupérer le texte de la publication depuis la requête
     if (validateTexte(text)) {
         const lastID = addPost(text);
@@ -185,6 +228,13 @@ app.post('/posts', async (req, res) => {
 // Rechercher un utilisateur
 app.get('/users/search', async (req, res) => {
 
+
+    // Check if user is logged in
+    if (!req.session.loggedIn) {
+        // Redirect user to login page
+        return res.redirect('/connexion');
+    }
+
     const { q } = req.query; // Récupérer le terme de recherche depuis la requête
 
     if (validateSearchTexte(q)) {
@@ -195,7 +245,8 @@ app.get('/users/search', async (req, res) => {
             scripts: ['/js/search.js', '/js/main.js'],
             styles: [],
             users: await searchUser(q),
-            acceptCookie: req.session.acceptCookie
+            acceptCookie: req.session.acceptCookie,
+            IsLoggedIn : req.session.IsLoggedIn
         });
     } else {
 
@@ -205,7 +256,8 @@ app.get('/users/search', async (req, res) => {
             scripts: ['/js/search.js', '/js/main.js'],
             styles: [],
             users: [],
-            acceptCookie: req.session.acceptCookie
+            acceptCookie: req.session.acceptCookie,
+            IsLoggedIn : req.session.IsLoggedIn
         });
     }
 
@@ -218,7 +270,8 @@ app.get('/aboutus', (req, res) => {
         layout: 'main',
         scripts: ['/js/main.js'],
         styles: [],
-        acceptCookie: req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie,
+        IsLoggedIn : req.session.IsLoggedIn
     });
 
 });
@@ -231,13 +284,21 @@ app.get('/contactus', (req, res) => {
         layout: 'main',
         scripts: ['/js/main.js'],
         styles: [],
-        acceptCookie: req.session.acceptCookie
+        acceptCookie: req.session.acceptCookie,
+        IsLoggedIn : req.session.IsLoggedIn
     });
 
 });
 
 // Afficher le profil et les publications d'un utilisateur spécifique
 app.get('/users/:id/posts', async (req, res) => {
+
+    // Check if user is logged in
+    if (!req.session.loggedIn) {
+        // Redirect user to login page
+        return res.redirect('/connexion');
+    }
+
 
     const id = Number(req.params.id);
 
@@ -246,11 +307,12 @@ app.get('/users/:id/posts', async (req, res) => {
         res.render('user', {
             titre: 'Utilisateurs | Liste Publications',
             layout: 'main',
-            scripts: ['/js/main.js'],
+            scripts: ['/js/main.js','/js/userprofile.js'],
             styles: [],
             posts: await getUserPosts(id),
             user: await getUser(id),
-            acceptCookie: req.session.acceptCookie
+            acceptCookie: req.session.acceptCookie,
+            IsLoggedIn : req.session.IsLoggedIn
         });
     }
     else {

@@ -31,10 +31,8 @@ formConnexion.addEventListener("submit", async function (event) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-
             // Ajoute le todo dans l'interface graphique et réinitialise le formulaire
             if (response.ok) {
-                const value = await response.json();
                 inputCourriel.value = '';
                 inputMotDePasse.value = '';
                 window.location.replace("/");
@@ -43,8 +41,10 @@ formConnexion.addEventListener("submit", async function (event) {
                 let repdata = await response.json();
                 // Utiliser "data" pour afficher l'erreur à l'utilisateur ici ...
                 console.error('Server error:', repdata);
+                window.alert("Une Erruere est sourvenue pendant la connexion : ",repdata.error);
             } else {
                 // Autres erreurs de réponse
+                window.alert("Une Erruere est sourvenue pendant la connexion : ",response.statusText);
                 console.error('Server error:', response.statusText);
             }
         } catch (error) {
