@@ -1,38 +1,48 @@
 import connectionPromise from '../connexion.js';
 
-// Rechercher un utilisateur
+/**
+ * Recherche des utilisateurs dont le nom correspond à la chaîne spécifiée.
+ * @param {string} q La chaîne de recherche pour le nom d'utilisateur.
+ * @returns {Promise<Array>} La liste des utilisateurs correspondant à la recherche.
+ */
 export async function searchUser(q) {
     const db = await connectionPromise; // Attendre la connexion à la base de données
-    // Exécuter la requête SQL pour rechercher des utilisateurs par nom
+    // Requête SQL pour rechercher des utilisateurs par nom
     const users = await db.all(`
         SELECT id_user AS id, name
         FROM users
         WHERE name LIKE ?
     `, [`%${q}%`]);
-    // Rendre la page de résultats de recherche avec les utilisateurs trouvés
+    // Renvoyer la liste des utilisateurs trouvés
     return users;
-};
+}
 
-
-
-// Afficher le profil et les publications d'un utilisateur spécifique
-
+/**
+ * Récupère les informations d'un utilisateur spécifique.
+ * @param {string} id L'identifiant de l'utilisateur à récupérer.
+ * @returns {Object} Les informations de l'utilisateur.
+ */
 export async function getUser(id) {
     const db = await connectionPromise; // Attendre la connexion à la base de données
-    // Exécuter la requête SQL pour récupérer les informations de l'utilisateur
+    // Requête SQL pour récupérer les informations de l'utilisateur par son identifiant
     const user = await db.get(`
         SELECT id_user AS id, name
         FROM users
         WHERE id_user = ?
     `, [id]);
 
+    // Renvoyer les informations de l'utilisateur
     return user;
-
 }
 
+/**
+ * Récupère les publications d'un utilisateur spécifique avec le nombre de likes pour chaque publication.
+ * @param {string} id L'identifiant de l'utilisateur dont récupérer les publications.
+ * @returns {Array} La liste des publications de l'utilisateur avec les détails.
+ */
 export async function getUserPosts(id) {
-    // Exécuter la requête SQL pour récupérer les publications de l'utilisateur avec le nombre de likes
     const db = await connectionPromise; // Attendre la connexion à la base de données
+    // Requête SQL pour récupérer les publications de l'utilisateur avec le nombre de likes
     const posts = await db.all(`
         SELECT posts.id_post, posts.text, posts.timestamp, users.name, COUNT(likes.id_user) as likes 
         FROM posts 
@@ -43,6 +53,6 @@ export async function getUserPosts(id) {
         ORDER BY posts.timestamp DESC
     `, [id]);
 
-    // Rendre la page de profil de l'utilisateur avec les publications récupérées
+    // Renvoyer la liste des publications de l'utilisateur avec les détails
     return posts;
-};
+}

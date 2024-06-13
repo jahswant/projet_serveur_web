@@ -18,7 +18,7 @@ export function validateTexte(texte) {
     return !!texte &&
         typeof texte === 'string' &&
         texte.length >= 10 &&
-        texte.length <= 100;
+        texte.length <= 250;
 }
 
 

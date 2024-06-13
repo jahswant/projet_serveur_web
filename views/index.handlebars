@@ -3,22 +3,18 @@
 <!-- Formulaire de création de publication -->
 <form id="form-ajout" novalidate> <!-- Le formulaire utilise la méthode POST et envoie les données à l'URL /posts -->
     <div>
-        <textarea id="text-ajout" name="text" placeholder="Écrire une publication..." required minlength="5"
-            maxlength="50"></textarea>
+        <textarea id="text-ajout" name="text" placeholder="Écrire une publication..." required minlength="10"
+            maxlength="250"></textarea>
         <!-- Champ de texte pour écrire la publication -->
         <button type="submit">Publier</button> <!-- Bouton pour soumettre le formulaire -->
-
     </div>
-
-    <div id="text-add-error" class="error"></div>
-
+    <div id="text-add-error" class="error"></div> <!-- Élément pour afficher les erreurs de validation -->
 </form>
 
-<!-- Liste des publications -->
-<ul>
+<ul id="posts-list">
     <!-- Boucle pour chaque publication -->
     {{#each posts}}
-    <li>
+    <li id="post-{{id_post}}">
         <!-- Afficher le nom de l'utilisateur et la date formatée de la publication -->
         <p><a target="_self" href="/users/{{id_user}}/posts"><strong>{{name}}</strong></a> - {{formatDate timestamp}}
         </p>
@@ -26,6 +22,14 @@
         <p>{{text}}</p>
         <!-- Afficher le nombre de likes pour la publication -->
         <p>Likes: {{likes}}</p>
+
+        <!-- Bouton de suppression (visible uniquement pour les modérateurs) -->
+        {{#if ../isModerator}}
+        <form class="delete-form" action="/delete/{{id_post}}/posts" method="POST">
+            <input type="hidden" name="postId" value="{{id_post}}">
+            <button type="submit">SUPPRIMER</button>
+        </form>
+        {{/if}}
     </li>
     {{/each}}
 </ul>

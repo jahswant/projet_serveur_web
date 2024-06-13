@@ -1,19 +1,28 @@
+<h1>Profil de {{user.name}}</h1> <!-- En-tête principal avec le nom de l'utilisateur -->
 
-    <!-- Your HTML content -->
-    <h1>Profil de {{user.name}}</h1> <!-- En-tête principal avec le nom de l'utilisateur -->
-    <form id="followForm">
-        <button type="submit" id="followButton">Follow</button>
-    </form>
-    <ul>
-        <!-- Boucle à travers chaque publication de l'utilisateur -->
-        {{#each posts}}
-        <li>
-            <!-- Afficher le nom de l'utilisateur et la date formatée de la publication -->
-            <p><strong>{{name}}</strong> - {{formatDate timestamp}}</p>
-            <!-- Afficher le texte de la publication -->
-            <p>{{text}}</p>
-            <!-- Afficher le nombre de likes de la publication -->
-            <p>Likes: {{likes}}</p>
-        </li>
-        {{/each}}
-    </ul>
+{{#unless UserLoggedIsMe}}
+<form id="followForm">
+    <input type="hidden" id="userId" value="{{user.id}}">
+    <button type="submit" id="followButton">
+        {{#if AmIFollowingUser}}
+            Unfollow
+        {{else}}
+            Follow
+        {{/if}}
+    </button>
+</form>
+{{/unless}}
+
+<ul>
+    <!-- Boucle à travers chaque publication de l'utilisateur -->
+    {{#each posts}}
+    <li>
+        <!-- Afficher le nom de l'utilisateur et la date formatée de la publication -->
+        <p><strong>{{name}}</strong> - {{formatDate timestamp}}</p>
+        <!-- Afficher le texte de la publication -->
+        <p>{{text}}</p>
+        <!-- Afficher le nombre de likes de la publication -->
+        <p>Likes: {{likes}}</p>
+    </li>
+    {{/each}}
+</ul>
