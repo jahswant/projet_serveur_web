@@ -1,3 +1,4 @@
+/* Définition du modèle de boîte pour tous les éléments */
 html {
     box-sizing: border-box;
 }
@@ -8,120 +9,136 @@ html {
     box-sizing: inherit;
 }
 
+/* Style de base pour le corps de la page */
 body {
-    font-family: Arial, sans-serif;
-    /* Définit la police de caractères pour tout le contenu de la page */
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    margin: 0;
+    font-family: Arial, sans-serif; /* Utilisation de la police Arial ou sans-serif par défaut */
+    display: flex; /* Utilisation de Flexbox pour l'agencement */
+    flex-direction: column; /* Empilement des éléments enfants verticalement */
+    min-height: 100vh; /* Hauteur minimale de 100% de la hauteur de la fenêtre */
+    margin: 0; /* Suppression des marges extérieures par défaut */
 }
 
-
-
+/* Style pour la section principale */
 main {
-    flex: 1;
-    max-width: 95%;
-    min-width: 95%;
-    margin: 0 auto;
+    flex: 1; /* Permet à la section principale de prendre tout l'espace disponible en hauteur */
+    max-width: 95%; /* Largeur maximale de 95% de la largeur de la fenêtre */
+    min-width: 95%; /* Largeur minimale de 95% de la largeur de la fenêtre */
+    margin: 0 auto; /* Centrage horizontal de la section principale */
 }
 
+/* Style pour les titres de niveau h1 */
 h1 {
-    color: #333;
-    /* Définit la couleur du texte des titres h1 en gris foncé (#333) */
+    color: #333; /* Couleur de texte gris foncé pour les titres h1 */
 }
 
+/* Style pour les formulaires */
 form {
-    margin-bottom: 20px;
-    /* Ajoute une marge en bas du formulaire de 20px */
+    margin-bottom: 20px; /* Marge en bas des formulaires de 20px */
 }
 
+/* Style pour les zones de texte */
 textarea {
-    width: 100%;
-    /* Définit la largeur du champ de texte à 100% de la largeur disponible */
-    height: 100px;
-    /* Définit la hauteur du champ de texte à 100 pixels */
-    margin-bottom: 10px;
-    /* Ajoute une marge en bas du champ de texte de 10px */
+    width: 100%; /* Largeur de 100% de l'espace disponible */
+    height: 100px; /* Hauteur fixe de 100 pixels */
+    margin-bottom: 10px; /* Marge en bas de 10px */
 }
 
+/* Style pour les champs de saisie */
 input {
-    width: 100%;
-    /* Définit la largeur du champ de texte à 100% de la largeur disponible */
-    height: 35px;
-    /* Définit la hauteur du champ de texte à 100 pixels */
-    margin-bottom: 10px;
-    /* Ajoute une marge en bas du champ de texte de 10px */
+    width: 100%; /* Largeur de 100% de l'espace disponible */
+    height: 35px; /* Hauteur fixe de 35 pixels */
+    margin-bottom: 10px; /* Marge en bas de 10px */
 }
 
+/* Style pour les boutons */
 button {
-    padding: 10px 15px;
-    /* Définit la taille de rembourrage du bouton */
-    background-color: #007bff;
-    /* Définit la couleur de fond du bouton en bleu (#007bff) */
-    color: white;
-    /* Définit la couleur du texte du bouton en blanc */
-    border: none;
-    /* Supprime la bordure du bouton */
-    cursor: pointer;
-    /* Définit le curseur de la souris en pointeur lorsque survolé */
+    width: 100%; /* Largeur de 100% de l'espace disponible */
+    padding: 10px 15px; /* Rembourrage intérieur de 10px en haut/bas et 15px à gauche/droite */
+    background-color: #007bff; /* Couleur de fond bleu pour les boutons */
+    color: white; /* Couleur de texte blanc pour les boutons */
+    border: none; /* Suppression de la bordure des boutons */
+    cursor: pointer; /* Curseur de souris en pointeur au survol */
 }
 
+/* Style pour les listes non ordonnées */
 ul {
-    list-style-type: none;
-    /* Supprime les puces de liste par défaut */
-    padding: 0;
-    /* Supprime la marge intérieure de la liste */
+    list-style-type: none; /* Suppression des puces par défaut */
+    padding: 0; /* Suppression de la marge intérieure */
 }
 
+/* Style pour les éléments de liste */
 li {
-    background-color: #f9f9f9;
-    /* Définit la couleur de fond des éléments de liste en gris très clair (#f9f9f9) */
-    margin-bottom: 10px;
-    /* Ajoute une marge en bas de chaque élément de liste de 10px */
-    padding: 10px;
-    /* Ajoute un remplissage intérieur de 10px à chaque élément de liste */
-    border-radius: 5px;
-    /* Arrondit les coins des éléments de liste avec un rayon de 5px */
+    background-color: #f9f9f9; /* Couleur de fond gris très clair pour chaque élément de liste */
+    margin-bottom: 10px; /* Marge en bas de chaque élément de liste de 10px */
+    padding: 10px; /* Rembourrage intérieur de 10px pour chaque élément de liste */
+    border-radius: 5px; /* Coins arrondis avec un rayon de 5px pour chaque élément de liste */
 }
 
+/* Style pour les paragraphes à l'intérieur des éléments de liste */
 li p {
-    margin: 5px 0;
-    /* Ajoute une marge en haut et en bas de chaque paragraphe à l'intérieur des éléments de liste */
+    margin: 5px 0; /* Marge en haut et en bas de chaque paragraphe à l'intérieur des éléments de liste */
 }
 
-
+/* Style pour les en-têtes et pieds de page */
 header,
 footer {
-    display: flex;
-    justify-content: center;
-    background-color: #007bff;
+    display: flex; /* Utilisation de Flexbox pour l'agencement */
+    justify-content: center; /* Centrage horizontal des éléments enfants */
+    background-color: #007bff; /* Couleur de fond bleu pour les en-têtes et pieds de page */
 }
 
-
+/* Style spécifique pour le pied de page */
 footer {
-    padding: 1rem;
+    padding: 1rem; /* Rembourrage intérieur de 1rem (16px) pour le pied de page */
 }
 
-
-/* Style for the navigation menu */
+/* Style pour la barre de navigation */
 .nav-menu {
-    display: flex;
-    justify-content: flex-end;
-    background-color: transparent;
-    padding: 10px;
+    display: flex; /* Utilisation de Flexbox pour l'agencement */
+    align-items: center; /* Alignement vertical centré des éléments enfants */
 }
 
+/* Style pour les liens et formulaires dans la barre de navigation */
+.nav-menu a,
+.nav-menu form {
+    margin: 0 10px; /* Marge à gauche et à droite de 10px pour les liens et formulaires */
+    text-decoration: none; /* Suppression du soulignement par défaut des liens */
+}
+
+/* Style pour les liens dans la barre de navigation */
 .nav-menu a {
-    margin-left: 15px;
-    text-decoration: none;
-    color: white;
+    padding: 10px; /* Rembourrage intérieur de 10px pour les liens */
+    color: white; /* Couleur de texte blanc pour les liens */
 }
 
+/* Style pour les boutons dans la barre de navigation */
+.nav-menu button {
+    padding: 10px; /* Rembourrage intérieur de 10px pour les boutons */
+    color: white; /* Couleur de texte blanc pour les boutons */
+    background: none; /* Suppression de la couleur de fond des boutons */
+    border: none; /* Suppression de la bordure des boutons */
+    cursor: pointer; /* Curseur de souris en pointeur au survol */
+    font: inherit; /* Utilisation de la police par défaut du navigateur pour les boutons */
+}
+
+/* Style de survol pour les liens et boutons dans la barre de navigation */
+.nav-menu button:hover,
 .nav-menu a:hover {
-    text-decoration: underline;
+    text-decoration: underline; /* Soulignement du texte au survol des liens et boutons */
 }
 
+/* Style pour les messages d'erreur */
 .error {
-    color: #a00;
+    color: #a00; /* Couleur de texte rouge pour les messages d'erreur */
+}
+
+/* Style pour une boîte de cookies ou notification */
+.cookies {
+    display: flex; /* Utilisation de Flexbox pour l'agencement */
+    gap: 1rem; /* Espacement de 1rem entre les enfants */
+    padding: 0.5rem; /* Rembourrage intérieur de 0.5rem pour la boîte */
+    margin: 1rem; /* Marge extérieure de 1rem pour la boîte */
+    background-color: white; /* Couleur de fond blanche pour la boîte */
+    align-items: center; /* Alignement vertical centré des enfants */
+    border: 1px solid; /* Bordure de 1px solide autour de la boîte */
 }

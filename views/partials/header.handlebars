@@ -1,10 +1,26 @@
 <header>
-    <!-- Navigation menu -->
+    <!-- Menu de navigation -->
     <div class="nav-menu">
-        <a target="_self" href="/">Accueil</a>
-        <a target="_self" href="/users/search">Utilisateurs</a>
-        <a target="_self" href="/aboutus">A Propos</a>
-        <a target="_self" href="/contactus">Nous Contacter</a>
-    </div>
+        <!-- Liens de navigation principaux -->
+        <a id="menu-acceuil" target="_self" href="/">Accueil</a>
+        <a id="menu-recherche" target="_self" href="/users/search">Utilisateurs</a>
+        <a id="menu-apropos" target="_self" href="/aboutus">À Propos</a>
 
+        <!-- Liens de connexion et d'inscription conditionnels -->
+        {{#unless IsLoggedIn}}
+            <a id="menu-connexion" target="_self" href="/connexion">Connexion</a>
+            <a id="menu-inscription" target="_self" href="/inscription">Inscription</a>
+        {{/unless}}
+
+        <!-- Lien du profil et formulaire de déconnexion conditionnels -->
+        {{#if IsLoggedIn}}
+            <a id="menu-profil" target="_self" href="/users/{{LoggedUser.id_user}}/posts">Profil</a>
+            <form id="logoutForm" action="/users/logout" method="POST" style="display:inline;">
+                <button type="submit" id="menu-deconnexion">Déconnexion</button>
+            </form>
+        {{/if}}
+
+        <!-- Lien pour contacter l'équipe -->
+        <a id="menu-contacter" target="_self" href="/contactus">Nous Contacter</a>
+    </div>
 </header>
