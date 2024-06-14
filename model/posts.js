@@ -65,6 +65,25 @@ export async function addPost(id_user, texte) {
     return result.lastID; // Retourne l'identifiant de la dernière publication ajoutée
 }
 
+export async function addPostLike(id_user, id_post) {
+    const connexion = await connectionPromise;
+
+    // Requête SQL pour insérer une nouvelle publication dans la base de données
+    await connexion.run(`
+        INSERT INTO likes (id_user, id_post) 
+        VALUES (?, ?)
+    `, [id_user, id_post]);
+
+    // Requête SQL pour compter le nombre de likes pour le post spécifié
+    const likeCountResult = await connexion.get(`
+        SELECT COUNT(*) AS likeCount FROM likes WHERE id_post = ?
+    `, [id_post]);
+
+    // Retourne le nombre de likes pour le post spécifié
+    return likeCountResult.likeCount;
+}
+
+
 /**
  * Supprime un post de la base de données.
  * @param {string} id_post L'identifiant du post à supprimer.

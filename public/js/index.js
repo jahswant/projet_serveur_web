@@ -3,50 +3,97 @@ const form = document.getElementById('form-ajout');
 const input = document.getElementById('text-ajout');
 const inputError = document.getElementById('text-add-error');
 const deleteForms = document.querySelectorAll('.delete-form');
+const likeForms = document.querySelectorAll('.like-form'); // Select all like forms
 
 // Attente du chargement complet du document pour garantir la disponibilité des éléments
 document.addEventListener('DOMContentLoaded', function () {
     // Sélection de tous les formulaires de suppression et ajout d'un écouteur d'événement sur leur soumission
-    const deleteForms = document.querySelectorAll('.delete-form');
     deleteForms.forEach(form => {
         form.addEventListener('submit', handleDelete);
     });
+
+    // Add event listeners to all like forms
+    likeForms.forEach(form => {
+        form.addEventListener('submit', handleLike);
+    });
 });
 
-// Fonction pour gérer la suppression d'un post
-async function handleDelete(event) {
-    // Empêcher la soumission par défaut du formulaire
+// Function to handle like submission
+async function handleLike(event) {
+    // Prevent the default form submission
     event.preventDefault();
 
-    // Récupérer le formulaire qui a déclenché l'événement
+    // Get the form that triggered the event
     const form = event.target;
 
-    // Récupérer l'identifiant du post à supprimer depuis le champ input caché
+    // Get the post ID from the hidden input field
     const postId = form.querySelector('input[name="postId"]').value;
 
-    // Exemple de gestion de la suppression via AJAX
-    const response = await fetch(`/delete/${postId}/posts`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ postId: postId })
-    });
+    try {
+        // Send a POST request to increment likes
+        const response = await fetch(`/posts/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id_post: postId }),
+        });
 
-    // Afficher dans la console la réponse reçue
-    console.log(response);
+        // Parse response JSON
+        const data = await response.json();
 
-    // Si la suppression a réussi, supprimer l'élément du DOM correspondant au post
-    if (response.ok) {
-        const postElement = document.getElementById(`post-${postId}`);
-        if (postElement) {
-            postElement.remove();
+        console.log(data);
+
+        // Update like count on success
+        if (response.ok) {
+            document.getElementById(`likes-count-${postId}`).textContent = data.likes;
+        } else {
+            // Handle error
+            console.error('Failed to increment likes');
         }
-    } else {
-        // En cas d'échec, afficher une alerte à l'utilisateur
-        window.alert('Une erreur est survenue pendant la suppression du poste.');
+    } catch (error) {
+        console.error('Error handling like:', error.message);
     }
 }
+
+// Function to handle post deletion
+async function handleDelete(event) {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    // Get the form that triggered the event
+    const form = event.target;
+
+    // Get the post ID from the hidden input field
+    const postId = form.querySelector('input[name="postId"]').value;
+
+    try {
+        // Send a POST request to delete the post
+        const response = await fetch(`/delete/${postId}/posts`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ postId: postId }),
+        });
+
+        // Remove the post from the DOM on success
+        if (response.ok) {
+            const postElement = document.getElementById(`post-${postId}`);
+            if (postElement) {
+                postElement.remove();
+            }
+        } else {
+            // Handle error
+            console.error('Failed to delete post');
+        }
+    } catch (error) {
+        console.error('Error handling delete:', error.message);
+    }
+}
+
+// Rest of your existing code for adding posts, validation, etc.
+
 
 // Fonction pour valider le champ de texte avant l'ajout d'un post
 function validateTextAdd() {

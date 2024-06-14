@@ -21,8 +21,14 @@
         <!-- Afficher le texte de la publication -->
         <p>{{text}}</p>
         <!-- Afficher le nombre de likes pour la publication -->
-        <p>Likes: {{likes}}</p>
-
+        <p>Likes: <span id="likes-count-{{id_post}}">{{likes}}</span></p>
+        {{#unless ../isModerator}}
+        <!-- Bouton de like -->
+        <form class="like-form" method="POST">
+            <input type="hidden" name="postId" value="{{id_post}}">
+            <button type="submit">Like</button>
+        </form>
+        {{/unless}}
         <!-- Bouton de suppression (visible uniquement pour les modérateurs) -->
         {{#if ../isModerator}}
         <form class="delete-form" action="/delete/{{id_post}}/posts" method="POST">

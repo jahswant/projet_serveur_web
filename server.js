@@ -7,22 +7,23 @@ import helmet from 'helmet'; // Middleware pour la sécurité
 import compression from 'compression'; // Middleware pour la compression des réponses
 import cors from 'cors'; // Middleware pour le partage des ressources entre origines
 import passport from "passport"; // Middleware pour l'authentification
-import { 
-    getPosts, addPost, getModeratorPosts, deletePost 
+import {
+    getPosts, addPost, getModeratorPosts, deletePost,
+    addPostLike
 } from './model/posts.js'; // Importer les fonctions de gestion des publications depuis le modèle
-import { 
-    getUser, getUserPosts, searchUser 
+import {
+    getUser, getUserPosts, searchUser
 } from './model/users.js'; // Importer les fonctions de gestion des utilisateurs depuis le modèle
-import { 
-    validateIdUser, validateTexte, validateCourriel, validateSearchTexte, 
-    validateMotDePasse, validateUsername 
+import {
+    validateIdUser, validateTexte, validateCourriel, validateSearchTexte,
+    validateMotDePasse, validateUsername
 } from './validation.js'; // Importer les fonctions de validation depuis un fichier dédié
-import { 
-    addUtilisateur, addUtilisateurSuivi, removeUtilisateurSuivi, isFollowing 
+import {
+    addUtilisateur, addUtilisateurSuivi, removeUtilisateurSuivi, isFollowing
 } from "./model/utilisateurs.js"; // Importer les fonctions de gestion des utilisateurs depuis le modèle
 import './passportconfig.js'; // Configuration de passport.js
 
-import  {estConnecte} from './middleware/verifsession.js';
+import { estConnecte, estModerateur } from './middleware/verifsession.js';
 
 const MemoryStore = memorystore(session); // Utiliser MemoryStore pour stocker les sessions en mémoire
 
@@ -100,19 +101,29 @@ app.get('/', estConnecte, async (req, res) => {
     });
 });
 
+
+app.post('/posts/like', estConnecte, async (req, res) => {
+    const id_post = Number(req.body.id_post); // Récupérer l'ID du poste.
+    const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
+
+    console.log("postId = ", id_post);
+    console.log("id_user = ", id_user);
+
+    const postLikeCount = await addPostLike(id_user, id_post);
+
+    // Send back the updated post with likes count
+    res.status(201).json({ likes: postLikeCount });
+});
+
+
 // Supprimer une publication spécifique
-app.post('/delete/:id_post/posts',  estConnecte, async (req, res) => {
+app.post('/delete/:id_post/posts', estConnecte, estModerateur, async (req, res) => {
 
-    const isModerator = (Number(req.user.id_user_type) == 2); // Vérifier si l'utilisateur est un modérateur
+    const { id_post } = req.params; // Récupérer l'ID de la publication à supprimer depuis les paramètres de l'URL
+    const postId = Number(id_post);
+    await deletePost(postId); // Appeler la fonction pour supprimer la publication
+    res.status(201).end(); // Répondre avec un statut 201 (Créé) pour indiquer que la suppression a réussi
 
-    if (isModerator) {
-        const { id_post } = req.params; // Récupérer l'ID de la publication à supprimer depuis les paramètres de l'URL
-        const postId = Number(id_post);
-        await deletePost(postId); // Appeler la fonction pour supprimer la publication
-        res.status(201).end(); // Répondre avec un statut 201 (Créé) pour indiquer que la suppression a réussi
-    } else {
-      //  return res.redirect('/connexion'); // Rediriger vers la page de connexion si l'utilisateur n'est pas un modérateur
-    }
 });
 
 // Connexion d'un utilisateur
@@ -155,7 +166,7 @@ app.post('/users/logout', (req, res, next) => {
 });
 
 // Page de connexion
-app.get('/connexion', estConnecte, async (req, res) => {
+app.get('/connexion', async (req, res) => {
     // Rendre la vue 'authentification' avec les données nécessaires
     res.render('authentification', {
         titre: 'Connectez Vous',
@@ -169,7 +180,7 @@ app.get('/connexion', estConnecte, async (req, res) => {
 });
 
 // Page d'Inscription
-app.get('/inscription',  estConnecte, async (req, res) => {
+app.get('/inscription', async (req, res) => {
     // Rendre la vue 'enregistrement' avec les données nécessaires
     res.render('enregistrement', {
         titre: 'Enregistez Vous',
@@ -207,7 +218,7 @@ app.post('/users/add', async (req, res) => {
 });
 
 // Ajouter une nouvelle publication
-app.post('/posts',  estConnecte, async (req, res) => {
+app.post('/posts', estConnecte, async (req, res) => {
 
     const { text } = req.body; // Récupérer le texte de la publication depuis la requête
     if (validateTexte(text)) {
@@ -221,7 +232,7 @@ app.post('/posts',  estConnecte, async (req, res) => {
 });
 
 // Rechercher un utilisateur
-app.get('/users/search',  estConnecte, async (req, res) => {
+app.get('/users/search', estConnecte, async (req, res) => {
 
     const { q } = req.query; // Récupérer le terme de recherche depuis la requête
 
@@ -281,7 +292,7 @@ app.get('/contactus', (req, res) => {
 });
 
 // Afficher le profil et les publications d'un utilisateur spécifique
-app.get('/users/:id/posts',  estConnecte, async (req, res) => {
+app.get('/users/:id/posts', estConnecte, async (req, res) => {
 
     const id = Number(req.params.id); // Récupérer l'ID de l'utilisateur depuis les paramètres d'URL
     const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
@@ -316,7 +327,7 @@ app.post("/api/cookies", (req, res) => {
 });
 
 // Suivre un utilisateur
-app.post("/users/follow",  estConnecte, async (req, res) => {
+app.post("/users/follow", estConnecte, async (req, res) => {
 
     try {
         const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
@@ -336,7 +347,7 @@ app.post("/users/follow",  estConnecte, async (req, res) => {
 
 // Ne plus suivre un utilisateur
 app.post("/users/unfollow", estConnecte, async (req, res) => {
- 
+
     try {
         const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
         const id_user_suivis = Number(req.body.id_user_suivis); // Récupérer l'ID de l'utilisateur à ne plus suivre depuis la requête
@@ -357,7 +368,7 @@ app.post("/users/unfollow", estConnecte, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`); // Afficher un message de confirmation dans la console
     console.log
-    ("http://localhost:" + PORT); // Afficher l'URL du serveur dans la console
+        ("http://localhost:" + PORT); // Afficher l'URL du serveur dans la console
 });
 
 
