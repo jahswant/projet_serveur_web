@@ -22,6 +22,8 @@ import {
 } from "./model/utilisateurs.js"; // Importer les fonctions de gestion des utilisateurs depuis le modèle
 import './passportconfig.js'; // Configuration de passport.js
 
+import  {estConnecte} from './middleware/verifsession.js';
+
 const MemoryStore = memorystore(session); // Utiliser MemoryStore pour stocker les sessions en mémoire
 
 const app = express(); // Créer une instance d'application express
@@ -72,12 +74,7 @@ app.use(express.static('public')); // Servir les fichiers statiques depuis le r�
 // Routes
 
 // Page d'accueil : afficher toutes les publications
-app.get('/', async (req, res) => {
-    // Vérifier si l'utilisateur est connecté
-    if (!req.session.IsLoggedIn) {
-        // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-        return res.redirect('/connexion');
-    }
+app.get('/', estConnecte, async (req, res) => {
 
     const isModerator = (Number(req.user.id_user_type) == 2); // Vérifier si l'utilisateur est un modérateur
     const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
@@ -104,12 +101,7 @@ app.get('/', async (req, res) => {
 });
 
 // Supprimer une publication spécifique
-app.post('/delete/:id_post/posts', async (req, res) => {
-    // Vérifier si l'utilisateur est connecté
-    if (!req.session.IsLoggedIn) {
-        // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-        return res.redirect('/connexion');
-    }
+app.post('/delete/:id_post/posts',  estConnecte, async (req, res) => {
 
     const isModerator = (Number(req.user.id_user_type) == 2); // Vérifier si l'utilisateur est un modérateur
 
@@ -119,7 +111,7 @@ app.post('/delete/:id_post/posts', async (req, res) => {
         await deletePost(postId); // Appeler la fonction pour supprimer la publication
         res.status(201).end(); // Répondre avec un statut 201 (Créé) pour indiquer que la suppression a réussi
     } else {
-        return res.redirect('/connexion'); // Rediriger vers la page de connexion si l'utilisateur n'est pas un modérateur
+      //  return res.redirect('/connexion'); // Rediriger vers la page de connexion si l'utilisateur n'est pas un modérateur
     }
 });
 
@@ -163,11 +155,7 @@ app.post('/users/logout', (req, res, next) => {
 });
 
 // Page de connexion
-app.get('/connexion', async (req, res) => {
-    if (req.session.IsLoggedIn) {
-        // Rediriger vers la page de / si l'utilisateur est connecté
-        return res.redirect('/');
-    }
+app.get('/connexion', estConnecte, async (req, res) => {
     // Rendre la vue 'authentification' avec les données nécessaires
     res.render('authentification', {
         titre: 'Connectez Vous',
@@ -181,11 +169,7 @@ app.get('/connexion', async (req, res) => {
 });
 
 // Page d'Inscription
-app.get('/inscription', async (req, res) => {
-    if (req.session.IsLoggedIn) {
-        // Rediriger vers la page de / si l'utilisateur est connecté
-        return res.redirect('/');
-    }
+app.get('/inscription',  estConnecte, async (req, res) => {
     // Rendre la vue 'enregistrement' avec les données nécessaires
     res.render('enregistrement', {
         titre: 'Enregistez Vous',
@@ -200,12 +184,6 @@ app.get('/inscription', async (req, res) => {
 
 // Ajouter un nouvel utilisateur
 app.post('/users/add', async (req, res) => {
-
-      // Vérifier si l'utilisateur est connecté
-      if (!req.session.IsLoggedIn) {
-        // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-        return res.redirect('/connexion');
-    }
 
     // Récupérer les données du formulaire d'inscription
     const { username, email, password } = req.body;
@@ -229,12 +207,7 @@ app.post('/users/add', async (req, res) => {
 });
 
 // Ajouter une nouvelle publication
-app.post('/posts', async (req, res) => {
-    // Vérifier si l'utilisateur est connecté
-    if (!req.session.IsLoggedIn) {
-        // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-        return res.redirect('/connexion');
-    }
+app.post('/posts',  estConnecte, async (req, res) => {
 
     const { text } = req.body; // Récupérer le texte de la publication depuis la requête
     if (validateTexte(text)) {
@@ -248,12 +221,7 @@ app.post('/posts', async (req, res) => {
 });
 
 // Rechercher un utilisateur
-app.get('/users/search', async (req, res) => {
-    // Vérifier si l'utilisateur est connecté
-    if (!req.session.IsLoggedIn) {
-        // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-        return res.redirect('/connexion');
-    }
+app.get('/users/search',  estConnecte, async (req, res) => {
 
     const { q } = req.query; // Récupérer le terme de recherche depuis la requête
 
@@ -313,12 +281,7 @@ app.get('/contactus', (req, res) => {
 });
 
 // Afficher le profil et les publications d'un utilisateur spécifique
-app.get('/users/:id/posts', async (req, res) => {
-    // Vérifier si l'utilisateur est connecté
-    if (!req.session.IsLoggedIn) {
-        // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-        return res.redirect('/connexion');
-    }
+app.get('/users/:id/posts',  estConnecte, async (req, res) => {
 
     const id = Number(req.params.id); // Récupérer l'ID de l'utilisateur depuis les paramètres d'URL
     const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
@@ -353,12 +316,7 @@ app.post("/api/cookies", (req, res) => {
 });
 
 // Suivre un utilisateur
-app.post("/users/follow", async (req, res) => {
-    // Vérifier si l'utilisateur est connecté
-    if (!req.session.IsLoggedIn) {
-        // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-        return res.redirect('/connexion');
-    }
+app.post("/users/follow",  estConnecte, async (req, res) => {
 
     try {
         const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
@@ -377,13 +335,8 @@ app.post("/users/follow", async (req, res) => {
 });
 
 // Ne plus suivre un utilisateur
-app.post("/users/unfollow", async (req, res) => {
-    // Vérifier si l'utilisateur est connecté
-    if (!req.session.IsLoggedIn) {
-        // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-        return res.redirect('/connexion');
-    }
-
+app.post("/users/unfollow", estConnecte, async (req, res) => {
+ 
     try {
         const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
         const id_user_suivis = Number(req.body.id_user_suivis); // Récupérer l'ID de l'utilisateur à ne plus suivre depuis la requête
@@ -406,4 +359,6 @@ app.listen(PORT, () => {
     console.log
     ("http://localhost:" + PORT); // Afficher l'URL du serveur dans la console
 });
+
+
 

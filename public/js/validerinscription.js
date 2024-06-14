@@ -51,7 +51,7 @@ form.addEventListener("submit", async function (event) {
 
             // Si la requête est réussie
             if (response.ok) {
-                const value = await response.json(); // Récupère éventuellement des données de réponse
+                //const value = await response.json(); // Récupère éventuellement des données de réponse
                 // Réinitialisation des champs du formulaire
                 nameInput.value = '';
                 passwordInput.value = '';
@@ -60,8 +60,10 @@ form.addEventListener("submit", async function (event) {
                 // Redirection vers la page de connexion avec une alerte de succès
                 window.location.replace("/connexion");
                 window.alert("Compte créé avec succès. Vous pouvez maintenant vous connecter !");
+            } else if (response.status == 409){
+                validateUniqueEmail();
             }
-        } catch (error) {
+        } catch (error) {          
             console.error('Fetch error:', error); // Affiche les erreurs liées à la requête fetch
         }
     }
@@ -76,6 +78,12 @@ function validateName() {
     }
     hideError(nameInput);
     return true;
+}
+
+
+// Fonction de validation de l'adresse email
+function validateUniqueEmail() {
+    showError(emailInput, "L'utilisateur avec cet email existe deja !");
 }
 
 // Fonction de validation de l'adresse email

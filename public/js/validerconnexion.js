@@ -48,7 +48,8 @@ formConnexion.addEventListener("submit", async function (event) {
                 let responseData = await response.json();
                 console.error('Server error:', responseData);
                 // Affichage d'une alerte avec le message d'erreur
-                window.alert("Une erreur est survenue pendant la connexion : " + responseData.error);
+                showError(inputCourriel, "Veuillez SVP verifier votre courriel !");
+                showError(inputMotDePasse, "Veuillez SVP verifier votre mot de passe !");
             } else {
                 // En cas d'autres erreurs de réponse, afficher le statut textuel de l'erreur
                 window.alert("Une erreur est survenue pendant la connexion : " + response.statusText);
