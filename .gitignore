@@ -51,8 +51,8 @@ web_modules/
 # Optional npm cache directory
 .npm
 
-# Optional database file
-.db
+# Ignore files with extension `.db`
+*.db
 
 # Optional eslint cache
 .eslintcache
