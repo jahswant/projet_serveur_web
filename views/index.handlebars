@@ -31,7 +31,7 @@
         {{/unless}}
         <!-- Bouton de suppression (visible uniquement pour les modérateurs) -->
         {{#if ../isModerator}}
-        <form class="delete-form" action="/delete/{{id_post}}/posts" method="POST">
+        <form class="delete-form" method="POST">
             <input type="hidden" name="postId" value="{{id_post}}">
             <button type="submit">SUPPRIMER</button>
         </form>

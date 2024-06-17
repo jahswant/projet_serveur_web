@@ -69,12 +69,12 @@ async function handleDelete(event) {
 
     try {
         // Send a POST request to delete the post
-        const response = await fetch(`/delete/${postId}/posts`, {
+        const response = await fetch(`/delete/posts`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ postId: postId }),
+            body: JSON.stringify({ id_post : postId }),
         });
 
         // Remove the post from the DOM on success

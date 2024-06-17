@@ -105,9 +105,13 @@ app.get('/', estConnecte, async (req, res) => {
 app.post('/posts/like', estConnecte, async (req, res) => {
     const id_post = Number(req.body.id_post); // Récupérer l'ID du poste.
     const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
-
-    console.log("postId = ", id_post);
-    console.log("id_user = ", id_user);
+    if (validateIdUser(id_post) && validateIdUser(id_user)) {
+        const postId = Number(id_post);
+        await deletePost(postId); // Appeler la fonction pour supprimer la publication
+        res.status(201).end(); // Répondre avec un statut 201 (Créé) pour indiquer que la suppression a réussi
+    } else {
+        res.status(404).end(); // Renvoyer une erreur 404 si l'ID de l'utilisateur est invalide
+    }
 
     const postLikeCount = await addPostLike(id_user, id_post);
 
@@ -117,13 +121,14 @@ app.post('/posts/like', estConnecte, async (req, res) => {
 
 
 // Supprimer une publication spécifique
-app.post('/delete/:id_post/posts', estConnecte, estModerateur, async (req, res) => {
-
-    const { id_post } = req.params; // Récupérer l'ID de la publication à supprimer depuis les paramètres de l'URL
-    const postId = Number(id_post);
-    await deletePost(postId); // Appeler la fonction pour supprimer la publication
-    res.status(201).end(); // Répondre avec un statut 201 (Créé) pour indiquer que la suppression a réussi
-
+app.post('/delete/posts', estConnecte, estModerateur, async (req, res) => {
+    const id_post = Number(req.body.id_post); // Récupérer l'ID du poste.
+    if (validateIdUser(id_post)) {
+        await deletePost(id_post); // Appeler la fonction pour supprimer la publication
+        res.status(201).end(); // Répondre avec un statut 201 (Créé) pour indiquer que la suppression a réussi
+    } else {
+        res.status(404).end(); // Renvoyer une erreur 404 si l'ID de l'utilisateur est invalide
+    }
 });
 
 // Connexion d'un utilisateur
