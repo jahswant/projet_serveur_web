@@ -20,7 +20,7 @@ export async function searchUser(q) {
 /**
  * Récupère les informations d'un utilisateur spécifique.
  * @param {string} id L'identifiant de l'utilisateur à récupérer.
- * @returns {Object} Les informations de l'utilisateur.
+ * @returns {Promise<Object>} Les informations de l'utilisateur.
  */
 export async function getUser(id) {
     const db = await connectionPromise; // Attendre la connexion à la base de données
@@ -38,7 +38,7 @@ export async function getUser(id) {
 /**
  * Récupère les publications d'un utilisateur spécifique avec le nombre de likes pour chaque publication.
  * @param {string} id L'identifiant de l'utilisateur dont récupérer les publications.
- * @returns {Array} La liste des publications de l'utilisateur avec les détails.
+ * @returns {Promise<Array>} La liste des publications de l'utilisateur avec les détails.
  */
 export async function getUserPosts(id) {
     const db = await connectionPromise; // Attendre la connexion à la base de données
