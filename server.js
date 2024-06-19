@@ -25,6 +25,10 @@ import './passportconfig.js'; // Configuration de passport.js
 
 import { estConnecte, estModerateur } from './middleware/verifsession.js';
 
+import {readFile} from 'fs/promises'
+
+import https from 'https';
+
 const MemoryStore = memorystore(session); // Utiliser MemoryStore pour stocker les sessions en mémoire
 
 const app = express(); // Créer une instance d'application express
@@ -106,17 +110,12 @@ app.post('/posts/like', estConnecte, async (req, res) => {
     const id_post = Number(req.body.id_post); // Récupérer l'ID du poste.
     const id_user = Number(req.user.id_user); // Récupérer l'ID de l'utilisateur connecté
     if (validateIdUser(id_post) && validateIdUser(id_user)) {
-        const postId = Number(id_post);
-        await deletePost(postId); // Appeler la fonction pour supprimer la publication
-        res.status(201).end(); // Répondre avec un statut 201 (Créé) pour indiquer que la suppression a réussi
+        const postLikeCount = await addPostLike(id_user, id_post);
+        // Send back the updated post with likes count
+        res.status(201).json({ likes: postLikeCount });
     } else {
         res.status(404).end(); // Renvoyer une erreur 404 si l'ID de l'utilisateur est invalide
-    }
-
-    const postLikeCount = await addPostLike(id_user, id_post);
-
-    // Send back the updated post with likes count
-    res.status(201).json({ likes: postLikeCount });
+    }   
 });
 
 
@@ -369,12 +368,31 @@ app.post("/users/unfollow", estConnecte, async (req, res) => {
     }
 });
 
+//Ajout du https dans le serveur.
+if (process.env.NODE_ENV === 'developement'){
+    https.createServer({
+        cert : await readFile('./security/localhost.cert'),
+        key : await readFile('./security/localhost.key'),
+    
+    },app).listen(PORT);
+    
+    console.log(`Server is running on port ${PORT}`); // Afficher un message de confirmation dans la console
+    console.log("https://localhost:" + PORT); // Afficher l'URL du serveur dans la console
+
+} else if (process.env.NODE_ENV === 'production'){
+
 // Démarrer le serveur
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`); // Afficher un message de confirmation dans la console
     console.log
         ("http://localhost:" + PORT); // Afficher l'URL du serveur dans la console
 });
+
+}
+
+
+
+
 
 
 
